@@ -7,6 +7,7 @@ const AuthForm = () => {
   const passwordInputRef = useRef();
 
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -18,8 +19,8 @@ const AuthForm = () => {
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
 
+    setIsLoading(true);
     if (isLogin) {
-
     }  else {
       fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyB418iATIRRCcn_7pH4kZ5cWEU_3uNpR4s', 
         {
@@ -34,13 +35,18 @@ const AuthForm = () => {
           }
         }
       ).then((res) => {
+        setIsLoading(false);
         if (res.ok) {
           // show
         } else {
           //shoe error modal
           return res.json().then((data) => {
-            console.log(data);
-          })
+            let errorMessage = 'Authentication failed!';
+            // if (data && data.error && data.error.message) {
+            //   errorMessage = data.error.message;
+            // }
+            alert(errorMessage);
+          });
         }
       })
     };
@@ -69,7 +75,8 @@ const AuthForm = () => {
           />
         </div>
         <div className={classes.actions}>
-          <button>{isLogin ? 'Login' : 'Create Account'}</button>
+          {!isLoading && <button>{isLogin ? 'Login' : 'Create Account'}</button>}
+          {isLoading && <p>Sending request...</p>}
           <button
             type='button'
             className={classes.toggle}
